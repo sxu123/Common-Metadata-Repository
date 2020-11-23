@@ -72,6 +72,7 @@
 
 (deftest search-for-variables-test
   (let [token (e/login (s/context) "user1")
+        ;; testing baselinebuild comment
         variable1 (variables/ingest-variable-with-attrs {:native-id "VAR1"
                                                          :Name "Variable1"
                                                          :LongName "Measurement1"
