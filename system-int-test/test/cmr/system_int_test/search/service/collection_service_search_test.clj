@@ -142,11 +142,10 @@
        [serv1-concept-id serv3-concept-id]))
 
     (testing "variable associations together with service associations"
-      (let [var-concept (variable-util/make-variable-concept
-                          {:Name "Variable1"}
-                          {:native-id "var1"
-                           :coll-concept-id (:concept-id coll1)})
-            {var-concept-id :concept-id} (variable-util/ingest-variable-with-association var-concept)]
+      (let [{var-concept-id :concept-id} (variable-util/ingest-variable-with-attrs
+                                          {:native-id "var1"
+                                           :Name "Variable1"})]
+        (au/associate-by-concept-ids token var-concept-id [{:concept-id (:concept-id coll1)}])
         (index/wait-until-indexed)
         ;; verify coll1 has-variables is true after associated with a variable,
         ;; coll2 has-variables is still false

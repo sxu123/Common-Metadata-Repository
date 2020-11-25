@@ -61,6 +61,12 @@
         ;; Add routes for tagging
         tags-api/tag-api-routes
 
+        ;; Add routes for assoication
+        association-api/association-api-routes
+
+        ;; Add routes for variable association
+        variables-api/variable-api-routes
+
         ;; Add routes for service association
         services-api/service-api-routes
 
