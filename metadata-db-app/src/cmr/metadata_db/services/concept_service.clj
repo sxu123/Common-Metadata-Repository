@@ -874,8 +874,10 @@
                          concept-id)))))
 
 (defn- update-service-associations
-  "Create a new revision for the non-tombstoned service associations that is related to the
-  given concept; Does noting if the given concept is not a service concept."
+  "Publish a concept-update-event for the non-tombstoned service associations that is related to the
+  given concept; The only purpose is to trigger the reindexing of the associated collections in elastic
+  search when service is updated because service info is indexed into the associated collections.
+  Does noting if the given concept is not a service concept."
   [context concept-type concept-id]
   (when (= :service concept-type)
     (let [search-params (cutil/remove-nil-keys
@@ -886,16 +888,15 @@
           associations (filter #(= false (:deleted %))
                                (search/find-concepts context search-params))]
       (doseq [association associations]
-        (save-concept-revision
-         context
-         (-> association
-             (dissoc :revision-id :revision-date :transaction-id)
-             ;; set user-id to cmr to indicate the association is created by CMR
-             (assoc :user-id "cmr")))))))
+        (ingest-events/publish-event
+          context
+         (ingest-events/concept-update-event association))))))
 
 (defn- update-tool-associations
-  "Create a new revision for the non-tombstoned tool associations that is related to the
-  given concept; Does noting if the given concept is not a tool concept."
+  "Publish a concept-update-event for the non-tombstoned tool associations that is related to the
+  given concept; The only purpose is to trigger the reindexing of the associated collections in elastic
+  search when tool is updated because tool info is indexed into the associated collections.
+  Does noting if the given concept is not a tool concept."
   [context concept-type concept-id]
   (when (= :tool concept-type)
     (let [search-params (cutil/remove-nil-keys
@@ -906,12 +907,9 @@
           associations (filter #(= false (:deleted %))
                                (search/find-concepts context search-params))]
       (doseq [association associations]
-        (save-concept-revision
-         context
-         (-> association
-             (dissoc :revision-id :revision-date :transaction-id)
-             ;; set user-id to cmr to indicate the association is created by CMR
-             (assoc :user-id "cmr")))))))
+        (ingest-events/publish-event
+          context
+         (ingest-events/concept-update-event association))))))
 
 ;; false implies creation of a non-tombstone revision
 (defmethod save-concept-revision false
